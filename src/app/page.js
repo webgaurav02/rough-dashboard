@@ -1,25 +1,43 @@
-// pages/dashboard.js
 'use client'
 
 import { useEffect, useState } from "react";
 
 export default function Dashboard() {
-  const [data, setData] = useState({ dashboardData: [], bookingDetails: [] });
+  const [data, setData] = useState({ dashboardData: [], bookingDetails: [], totalSeats: 0 });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // Number of booking orders to display per page
 
   useEffect(() => {
     async function fetchData() {
       const res = await fetch("/api/booking");
       const json = await res.json();
       setData(json);
+      console.log(json);
     }
     fetchData();
-    const intervalId = setInterval(fetchData, 10000); // Fetch data every 10 seconds
+    const intervalId = setInterval(fetchData, 5000); // Fetch data every 10 seconds
     return () => clearInterval(intervalId);
   }, []);
+
+  // Calculate indices for current page orders
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentOrders = data.bookingDetails.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(data.bookingDetails.length / itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div style={{ padding: "20px" }}>
       <h1>Ticket Dashboard</h1>
+
+      {/* New section to display total seats */}
+      <div style={{ marginBottom: "30px", textAlign: "center", border: "1px solid black", width: "fit-content", padding: "0.5% 4%", background: "#f2f2f2", color: "black", borderRadius: "5px" }}>
+        <h2 style={{ fontSize: "16px", fontWeight: "bold" }}>Total Seats</h2>
+        <p style={{ fontSize: "32px", fontWeight: "bold" }}>{data.totalSeats}</p>
+      </div>
 
       <div
         style={{
@@ -39,7 +57,7 @@ export default function Dashboard() {
               textAlign: "center",
             }}
           >
-            <h3>{item.section}</h3>
+            <h3>{item.bowl}</h3>
             <p><strong>Sold:</strong> {item.sold}</p>
             <p><strong>Remaining:</strong> {item.remaining}</p>
             <p><strong>Locked:</strong> {item.locked}</p>
@@ -48,7 +66,7 @@ export default function Dashboard() {
       </div>
 
       <h2>Booking Orders</h2>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "20px" }}>
         <thead>
           <tr style={{ background: "#f2f2f2" }}>
             <th style={{ border: "1px solid #ccc", padding: "8px" }}>Transaction ID</th>
@@ -60,7 +78,7 @@ export default function Dashboard() {
           </tr>
         </thead>
         <tbody>
-          {data.bookingDetails.map((order) => (
+          {currentOrders.map((order) => (
             <tr key={order._id}>
               <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.transactionId}</td>
               <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.userId}</td>
@@ -72,6 +90,25 @@ export default function Dashboard() {
           ))}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+        <button 
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          style={{ marginRight: "10px" }}
+        >
+          Previous
+        </button>
+        <span>Page {currentPage} of {totalPages}</span>
+        <button 
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          style={{ marginLeft: "10px" }}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

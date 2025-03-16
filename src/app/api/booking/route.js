@@ -61,6 +61,7 @@ export async function GET(request) {
       {
         $project: {
           section: "$sectionDetails.sectionID", // e.g., "lower-bowl-3"
+          bowl: "$sectionDetails.bowl",
           sold: 1,
           remaining: 1,
           locked: 1,
@@ -73,11 +74,17 @@ export async function GET(request) {
       },
     ]);
 
+    // Calculate total seats from all sections.
+    // Here, we assume total seats in each section is the sum of sold, remaining, and locked seats.
+    const totalSeats = dashboardData.reduce((acc, section) => {
+      return acc + section.sold
+    }, 0);
+
     // Retrieve all booking details for the table view, sorted in descending order by creation date.
     const bookingDetails = await Booking.find({}).sort({ createdAt: -1 });
 
     return new Response(
-      JSON.stringify({ dashboardData, bookingDetails }),
+      JSON.stringify({ dashboardData, bookingDetails, totalSeats }),
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
