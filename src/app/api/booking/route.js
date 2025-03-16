@@ -7,14 +7,18 @@ export async function GET(request) {
   await connectMongo();
 
   try {
-    // Aggregation pipeline for dashboardData: groups bookings by section and sums up sold seats (confirmed) and cancelled seats.
+    // Aggregation pipeline for dashboardData: groups bookings by section and sums up sold seats (confirmed or confirmed-through-api) and cancelled seats.
     const dashboardData = await Booking.aggregate([
       {
         $group: {
           _id: "$sectionId",
           sold: {
             $sum: {
-              $cond: [{ $eq: ["$status", "confirmed"] }, "$numberOfSeats", 0],
+              $cond: [
+                { $in: ["$status", ["confirmed", "confirmed-through-api"]] },
+                "$numberOfSeats",
+                0
+              ],
             },
           },
           cancelled: {
