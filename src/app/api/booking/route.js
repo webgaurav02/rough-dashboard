@@ -1,7 +1,5 @@
 // app/api/dashboard/route.js
 import Booking from "@/models/Booking";
-// import MatchAvailability from "@/models/MatchAvailability";
-// import Section from "@/models/Section";
 import connectMongo from "@/lib/mongodb";
 import mongoose from "mongoose";
 
@@ -9,7 +7,7 @@ export async function GET(request) {
   await connectMongo();
 
   try {
-    // Aggregation pipeline to group bookings by section and sum up sold seats (confirmed) and cancelled seats.
+    // Aggregation pipeline for dashboardData: groups bookings by section and sums up sold seats (confirmed) and cancelled seats.
     const dashboardData = await Booking.aggregate([
       {
         $group: {
@@ -26,26 +24,26 @@ export async function GET(request) {
           },
         },
       },
-      // Convert the grouped _id (which is a string) to an ObjectId so we can match it with Section and MatchAvailability.
+      // Convert section id (string) to ObjectId for lookups.
       {
         $addFields: {
           sectionObjId: { $toObjectId: "$_id" },
         },
       },
-      // Join with Sections to get the friendly section name.
+      // Lookup section details to get sectionID and bowl.
       {
         $lookup: {
-          from: "sections", // collection name for Section documents
+          from: "sections",
           localField: "sectionObjId",
           foreignField: "_id",
           as: "sectionDetails",
         },
       },
       { $unwind: "$sectionDetails" },
-      // Join with MatchAvailability to fetch the remaining available seats and locked seats.
+      // Lookup match availability details.
       {
         $lookup: {
-          from: "matchavailabilities", // collection name for MatchAvailability documents
+          from: "matchavailabilities",
           localField: "sectionObjId",
           foreignField: "section",
           as: "availability",
@@ -68,20 +66,55 @@ export async function GET(request) {
           cancelled: 1,
         },
       },
-      // Sorting sections alphabetically by section name to maintain a fixed order.
       {
         $sort: { section: 1 },
       },
     ]);
 
-    // Calculate total seats from all sections.
-    // Here, we assume total seats in each section is the sum of sold, remaining, and locked seats.
-    const totalSeats = dashboardData.reduce((acc, section) => {
-      return acc + section.sold
-    }, 0);
+    // Calculate total seats across all sections (example: summing sold seats).
+    const totalSeats = dashboardData.reduce((acc, section) => acc + section.sold, 0);
 
-    // Retrieve all booking details for the table view, sorted in descending order by creation date.
-    const bookingDetails = await Booking.find({}).sort({ createdAt: -1 });
+    // Retrieve all booking details along with the bowl field and ticket imageUrl.
+    const bookingDetails = await Booking.aggregate([
+      // Convert booking.sectionId to ObjectId to lookup section details.
+      {
+        $addFields: { sectionObjId: { $toObjectId: "$sectionId" } },
+      },
+      {
+        $lookup: {
+          from: "sections",
+          localField: "sectionObjId",
+          foreignField: "_id",
+          as: "sectionDetails",
+        },
+      },
+      { $unwind: { path: "$sectionDetails", preserveNullAndEmptyArrays: true } },
+      // Add the bowl field from the section.
+      {
+        $addFields: { bowl: "$sectionDetails.bowl" },
+      },
+      // Lookup corresponding ticket document from the tickets collection.
+      {
+        $lookup: {
+          from: "tickets",
+          localField: "_id", // booking _id
+          foreignField: "bookingId", // ticket's bookingId
+          as: "ticketDetails",
+        },
+      },
+      // Add the imageUrl field from the ticket, if available.
+      {
+        $addFields: { imageUrl: { $arrayElemAt: ["$ticketDetails.imageUrl", 0] } },
+      },
+      { $sort: { createdAt: -1 } },
+      {
+        $project: {
+          sectionDetails: 0,
+          sectionObjId: 0,
+          ticketDetails: 0,
+        },
+      },
+    ]);
 
     return new Response(
       JSON.stringify({ dashboardData, bookingDetails, totalSeats }),
