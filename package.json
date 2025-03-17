@@ -13,6 +13,7 @@
     "mongoose": "^8.12.1",
     "next": "15.2.2",
     "postcss": "^8.5.3",
+    "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-csv": "^2.2.2",
     "react-dom": "^19.0.0",

@@ -106,6 +106,13 @@ export async function GET(request) {
           as: "ticketDetails",
         },
       },
+      {
+        $addFields: {
+          ticketId: { $arrayElemAt: ["$ticketDetails._id", 0] },
+          imageUrl: { $arrayElemAt: ["$ticketDetails.imageUrl", 0] },
+          used: { $arrayElemAt: ["$ticketDetails.used", 0] },
+        },
+      },
       // Add the imageUrl field from the ticket, if available.
       {
         $addFields: { imageUrl: { $arrayElemAt: ["$ticketDetails.imageUrl", 0] } },
