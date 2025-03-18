@@ -35,7 +35,8 @@ export default function Dashboard() {
       order.bowl?.toString().toLowerCase().includes(query) ||
       order.numberOfSeats?.toString().toLowerCase().includes(query) ||
       order.status?.toString().toLowerCase().includes(query) ||
-      order.totalAmount?.toString().toLowerCase().includes(query)
+      order.totalAmount?.toString().toLowerCase().includes(query) ||
+      order.used?.toString().toLowerCase().includes(query)
     );
   });
 
@@ -219,9 +220,9 @@ export default function Dashboard() {
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.bowl}</td>
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.numberOfSeats}</td>
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.status}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px", color: order.used ? "blue" : "red", fontWeight: "bold" }}>
-                  {order.used ? "Used" : "Unused"}
-                </td>
+                {<td style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center", color: order.used ? "red" : "blue", fontWeight: "bold" }}>
+                  {order.used ? "Used" : ""}
+                </td>}
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.totalAmount}</td>
                 <td style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center" }}>
                   {order.imageUrl ? (
