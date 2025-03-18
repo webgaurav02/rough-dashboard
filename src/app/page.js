@@ -65,6 +65,7 @@ export default function Dashboard() {
       "Bowl",
       "Seats",
       "Status",
+      "Used",
       "Total Amount",
       "Ticket Image",
       "Ticket ID"
@@ -79,6 +80,7 @@ export default function Dashboard() {
         order.bowl,
         order.numberOfSeats,
         order.status,
+        order.used ? "Used" : "Unused",
         order.totalAmount,
         order.imageUrl || "",
         order.ticketId || ""
@@ -135,9 +137,17 @@ export default function Dashboard() {
       <h1>Ticket Dashboard</h1>
 
       {/* Total Seats Section */}
-      <div style={{ marginBottom: "30px", textAlign: "center", border: "1px solid black", width: "fit-content", padding: "0.5% 4%", background: "#f2f2f2", color: "black", borderRadius: "5px" }}>
-        <h2 style={{ fontSize: "16px", fontWeight: "bold" }}>Total Seats</h2>
-        <p style={{ fontSize: "32px", fontWeight: "bold" }}>{data.totalSeats}</p>
+      <div  style={{display: "flex", gap: 20}}>
+        <div style={{ marginBottom: "30px", textAlign: "center", border: "1px solid black", width: "fit-content", padding: "0.5% 4%", background: "#f2f2f2", color: "black", borderRadius: "5px" }}>
+          <h2 style={{ fontSize: "16px", fontWeight: "bold" }}>Total Seats</h2>
+          <p style={{ fontSize: "32px", fontWeight: "bold" }}>{data.totalSeats}</p>
+        </div>
+
+        {/* Total Used Tickets */}
+        <div style={{ marginBottom: "30px", textAlign: "center", border: "1px solid black", width: "fit-content", padding: "0.5% 4%", background: "#f2f2f2", color: "black", borderRadius: "5px" }}>
+          <h2 style={{ fontSize: "16px", fontWeight: "bold" }}>Total Seats</h2>
+          <p style={{ fontSize: "32px", fontWeight: "bold" }}>{data.totalUsedTickets}</p>
+        </div>
       </div>
 
       {/* Dashboard Grid */}
@@ -193,6 +203,7 @@ export default function Dashboard() {
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Bowl</th>
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Seats</th>
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Status</th>
+              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Used</th>
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Total Amount</th>
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Ticket Image</th>
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>QR Code</th>
@@ -208,6 +219,9 @@ export default function Dashboard() {
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.bowl}</td>
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.numberOfSeats}</td>
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.status}</td>
+                <td style={{ border: "1px solid #ccc", padding: "8px", color: order.used ? "blue" : "red", fontWeight: "bold" }}>
+                  {order.used ? "Used" : "Unused"}
+                </td>
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.totalAmount}</td>
                 <td style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center" }}>
                   {order.imageUrl ? (
