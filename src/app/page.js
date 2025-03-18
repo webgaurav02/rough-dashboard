@@ -145,7 +145,7 @@ export default function Dashboard() {
 
         {/* Total Used Tickets */}
         <div style={{ marginBottom: "30px", textAlign: "center", border: "1px solid black", width: "fit-content", padding: "0.5% 4%", background: "#f2f2f2", color: "black", borderRadius: "5px" }}>
-          <h2 style={{ fontSize: "16px", fontWeight: "bold" }}>Total Seats</h2>
+          <h2 style={{ fontSize: "16px", fontWeight: "bold" }}>Total Redeemed</h2>
           <p style={{ fontSize: "32px", fontWeight: "bold" }}>{data.totalUsedTickets}</p>
         </div>
       </div>
