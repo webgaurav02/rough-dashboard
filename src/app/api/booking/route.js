@@ -128,7 +128,8 @@ export async function GET(request) {
     ]);
 
     // Calculate total number of used tickets from bookingDetails.
-    const totalUsedTickets = bookingDetails.reduce((acc, booking) => booking.used ? acc + 1 : acc, 0);
+    const totalUsedTickets = bookingDetails.reduce((acc, booking) => booking.used ? acc + (1 * booking.numberOfSeats) : acc, 0);
+    
 
     return new Response(
       JSON.stringify({ dashboardData, bookingDetails, totalSeats, totalUsedTickets }),
