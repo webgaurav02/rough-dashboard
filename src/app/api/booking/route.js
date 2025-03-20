@@ -1,14 +1,19 @@
-// app/api/dashboard/route.js
 import Booking from "@/models/Booking";
 import connectMongo from "@/lib/mongodb";
 import mongoose from "mongoose";
 
 export async function GET(request) {
   await connectMongo();
-
+  
   try {
-    // Aggregation pipeline for dashboardData: groups bookings by section and sums up sold seats (confirmed or confirmed-through-api) and cancelled seats.
+    // Convert the match id string to a mongoose ObjectId.
+    const matchObjectId = new mongoose.Types.ObjectId("67d16b4c09b739aba8f1ac9b");
+
+    // Updated dashboardData aggregation with a $match filter
     const dashboardData = await Booking.aggregate([
+      {
+        $match: { matchId: matchObjectId } // Filter bookings by match id
+      },
       {
         $group: {
           _id: "$sectionId",
@@ -62,7 +67,7 @@ export async function GET(request) {
       },
       {
         $project: {
-          section: "$sectionDetails.sectionID", // e.g., "lower-bowl-3"
+          section: "$sectionDetails.sectionID",
           bowl: "$sectionDetails.bowl",
           sold: 1,
           remaining: 1,
@@ -78,8 +83,11 @@ export async function GET(request) {
     // Calculate total seats across all sections (example: summing sold seats).
     const totalSeats = dashboardData.reduce((acc, section) => acc + section.sold, 0);
 
-    // Retrieve all booking details along with the bowl field and ticket imageUrl.
+    // Updated bookingDetails aggregation with the same $match filter.
     const bookingDetails = await Booking.aggregate([
+      {
+        $match: { matchId: matchObjectId } // Only fetch bookings with the specified match id.
+      },
       // Convert booking.sectionId to ObjectId to lookup section details.
       {
         $addFields: { sectionObjId: { $toObjectId: "$sectionId" } },
@@ -113,7 +121,7 @@ export async function GET(request) {
           used: { $arrayElemAt: ["$ticketDetails.used", 0] },
         },
       },
-      // Add the imageUrl field from the ticket, if available.
+      // Ensure imageUrl is added from the ticket details.
       {
         $addFields: { imageUrl: { $arrayElemAt: ["$ticketDetails.imageUrl", 0] } },
       },
@@ -130,7 +138,6 @@ export async function GET(request) {
     // Calculate total number of used tickets from bookingDetails.
     const totalUsedTickets = bookingDetails.reduce((acc, booking) => booking.used ? acc + (1 * booking.numberOfSeats) : acc, 0);
     
-
     return new Response(
       JSON.stringify({ dashboardData, bookingDetails, totalSeats, totalUsedTickets }),
       {
