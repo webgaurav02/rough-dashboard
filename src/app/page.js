@@ -20,8 +20,8 @@ export default function Dashboard() {
       console.log(json);
     }
     fetchData();
-    const intervalId = setInterval(fetchData, 5000); // Fetch data every 5 seconds
-    return () => clearInterval(intervalId);
+    // const intervalId = setInterval(fetchData, 5000); // Fetch data every 5 seconds
+    // return () => clearInterval(intervalId);
   }, []);
 
   // Filter booking orders based on search query including the bowl, paymentId, etc.
@@ -30,12 +30,12 @@ export default function Dashboard() {
     return (
       order.transactionId?.toString().toLowerCase().includes(query) ||
       order.ticketId?.toString().toLowerCase().includes(query) ||
-      order.paymentId?.toString().toLowerCase().includes(query) ||
+      // order.paymentId?.toString().toLowerCase().includes(query) ||
       order.userId?.toString().toLowerCase().includes(query) ||
-      order.bowl?.toString().toLowerCase().includes(query) ||
+      // order.bowl?.toString().toLowerCase().includes(query) ||
       order.numberOfSeats?.toString().toLowerCase().includes(query) ||
-      order.status?.toString().toLowerCase().includes(query) ||
-      order.totalAmount?.toString().toLowerCase().includes(query) ||
+      // order.status?.toString().toLowerCase().includes(query) ||
+      // order.totalAmount?.toString().toLowerCase().includes(query) ||
       order.used?.toString().toLowerCase().includes(query)
     );
   });
@@ -61,14 +61,14 @@ export default function Dashboard() {
     let csvContent = "data:text/csv;charset=utf-8,";
     const headers = [
       "Transaction ID",
-      "Razorpay",
+      // "Razorpay",
       "User ID",
-      "Bowl",
+      // "Bowl",
       "Seats",
-      "Status",
+      // "Status",
       "Used",
-      "Total Amount",
-      "Ticket Image",
+      // "Total Amount",
+      // "Ticket Image",
       "Ticket ID"
     ];
     csvContent += headers.join(",") + "\n";
@@ -76,14 +76,14 @@ export default function Dashboard() {
     orders.forEach((order) => {
       const row = [
         order.transactionId,
-        order.paymentId || "",
+        // order.paymentId || "",
         order.userId,
-        order.bowl,
+        // order.bowl,
         order.numberOfSeats,
-        order.status,
+        // order.status,
         order.used ? "Used" : "Unused",
-        order.totalAmount,
-        order.imageUrl || "",
+        // order.totalAmount,
+        // order.imageUrl || "",
         order.ticketId || ""
       ];
       csvContent += row.map((value) => `"${value}"`).join(",") + "\n";
@@ -199,14 +199,14 @@ export default function Dashboard() {
           <thead>
             <tr style={{ background: "#f2f2f2" }}>
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Transaction ID</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Razorpay</th>
+              {/* <th style={{ border: "1px solid #ccc", padding: "8px" }}>Razorpay</th> */}
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>User ID</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Bowl</th>
+              {/* <th style={{ border: "1px solid #ccc", padding: "8px" }}>Bowl</th> */}
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Seats</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Status</th>
+              {/* <th style={{ border: "1px solid #ccc", padding: "8px" }}>Status</th> */}
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Used</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Total Amount</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Ticket Image</th>
+              {/* <th style={{ border: "1px solid #ccc", padding: "8px" }}>Total Amount</th> */}
+              {/* <th style={{ border: "1px solid #ccc", padding: "8px" }}>Ticket Image</th> */}
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>QR Code</th>
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Ticket ID</th>
             </tr>
@@ -215,16 +215,16 @@ export default function Dashboard() {
             {currentOrders.map((order) => (
               <tr key={order._id}>
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.transactionId}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.paymentId || "-"}</td>
+                {/* <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.paymentId || "-"}</td> */}
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.userId}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.bowl}</td>
+                {/* <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.bowl}</td> */}
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.numberOfSeats}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.status}</td>
+                {/* <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.status}</td> */}
                 {<td style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center", color: order.used ? "red" : "blue", fontWeight: "bold" }}>
                   {order.used ? "Used" : ""}
                 </td>}
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.totalAmount}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center" }}>
+                {/* <td style={{ border: "1px solid #ccc", padding: "8px" }}>{order.totalAmount}</td> */}
+                {/* <td style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center" }}>
                   {order.imageUrl ? (
                     <button onClick={() => openModal(order.imageUrl)} style={{ padding: "4px 8px" }}>
                       View
@@ -232,7 +232,7 @@ export default function Dashboard() {
                   ) : (
                     "N/A"
                   )}
-                </td>
+                </td> */}
                 <td style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center" }}>
                   {order.ticketId ? (
                     <button onClick={() => openQRModal(order.ticketId)} style={{ padding: "4px 8px" }}>

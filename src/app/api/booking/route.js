@@ -86,53 +86,36 @@ export async function GET(request) {
     // Updated bookingDetails aggregation with the same $match filter.
     const bookingDetails = await Booking.aggregate([
       {
-        $match: { matchId: matchObjectId } // Only fetch bookings with the specified match id.
+        $match: {
+          matchId: matchObjectId,
+          status: { $in: ["confirmed", "confirmed-through-api"] } // Only include confirmed statuses.
+        }
       },
-      // Convert booking.sectionId to ObjectId to lookup section details.
-      {
-        $addFields: { sectionObjId: { $toObjectId: "$sectionId" } },
-      },
-      {
-        $lookup: {
-          from: "sections",
-          localField: "sectionObjId",
-          foreignField: "_id",
-          as: "sectionDetails",
-        },
-      },
-      { $unwind: { path: "$sectionDetails", preserveNullAndEmptyArrays: true } },
-      // Add the bowl field from the section.
-      {
-        $addFields: { bowl: "$sectionDetails.bowl" },
-      },
-      // Lookup corresponding ticket document from the tickets collection.
       {
         $lookup: {
           from: "tickets",
-          localField: "_id", // booking _id
-          foreignField: "bookingId", // ticket's bookingId
+          localField: "_id",          // booking _id
+          foreignField: "bookingId",   // ticket's bookingId
           as: "ticketDetails",
         },
       },
       {
         $addFields: {
           ticketId: { $arrayElemAt: ["$ticketDetails._id", 0] },
-          imageUrl: { $arrayElemAt: ["$ticketDetails.imageUrl", 0] },
           used: { $arrayElemAt: ["$ticketDetails.used", 0] },
         },
       },
-      // Ensure imageUrl is added from the ticket details.
-      {
-        $addFields: { imageUrl: { $arrayElemAt: ["$ticketDetails.imageUrl", 0] } },
-      },
-      { $sort: { createdAt: -1 } },
+      // Project only the required fields including userId.
       {
         $project: {
-          sectionDetails: 0,
-          sectionObjId: 0,
-          ticketDetails: 0,
+          transactionId: 1,
+          userId: 1,
+          used: 1,
+          ticketId: 1,
+          numberOfSeats: 1
         },
       },
+      { $sort: { createdAt: -1 } }
     ]);
 
     // Calculate total number of used tickets from bookingDetails.
